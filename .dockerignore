@@ -1,0 +1,43 @@
+# Build outputs
+bin/
+obj/
+dist/
+build/
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDEs & Editors
+.vscode/
+.vs/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.user
+*.suo
+
+# Logs
+logs/
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Tests
+test-results/
+coverage/
+
+# Documentation
+*.md
+docs/
+
+# Temporary
+tmp/
+temp/
+*.tmp
