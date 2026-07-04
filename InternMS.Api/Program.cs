@@ -215,11 +215,14 @@ var app = builder.Build();
 app.UseGlobalExceptionHandler();
 
 // 2. Swagger/API Documentation (development only)
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// if (app.Environment.IsDevelopment())
+// {
+//     app.UseSwagger();
+//     app.UseSwaggerUI();
+// }
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // 3. Security Headers (protect against common attacks)
 app.UseSecurityHeaders();
