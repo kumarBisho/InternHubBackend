@@ -183,7 +183,7 @@ builder.Services.AddCors(options =>
         // Development: Allow multiple common dev ports
         options.AddPolicy("AllowFrontend",
             p => p
-                .WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://localhost:3001", frontendUrl)
+                .WithOrigins("http://localhost:5173", "https://internhubfrontend-yvjd.onrender.com/", frontendUrl)
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials()
