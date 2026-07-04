@@ -114,9 +114,16 @@ builder.Services.AddSingleton<IUserIdProvider, SignalRUserIdProvider>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // PostgreSQL + EF Core
+// builder.Services.AddDbContextPool<AppDbContext>(options =>
+//     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+// );
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+Console.WriteLine($"Connection String: {connectionString}");
+
 builder.Services.AddDbContextPool<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-);
+    options.UseNpgsql(connectionString));
 
 // JWT Settings
 var jwtKey = builder.Configuration["Jwt:Key"];
