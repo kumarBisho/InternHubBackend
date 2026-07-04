@@ -176,30 +176,43 @@ builder.Services.AddAuthentication(options =>
 });
 
 // CORS
+// builder.Services.AddCors(options =>
+// {
+//     if (isDevelopment)
+//     {
+//         // Development: Allow multiple common dev ports
+//         options.AddPolicy("AllowFrontend",
+//             p => p
+//                 .WithOrigins("http://localhost:5173", "https://internhubfrontend-yvjd.onrender.com/", frontendUrl)
+//                 .AllowAnyHeader()
+//                 .AllowAnyMethod()
+//                 .AllowCredentials()
+//         );
+//     }
+//     else
+//     {
+//         // Production: Only allow specific frontend URL
+//         options.AddPolicy("AllowFrontend",
+//             p => p
+//                 .WithOrigins(frontendUrl)
+//                 .AllowAnyHeader()
+//                 .AllowAnyMethod()
+//                 .AllowCredentials()
+//         );
+//     }
+// });
+
 builder.Services.AddCors(options =>
 {
-    if (isDevelopment)
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        // Development: Allow multiple common dev ports
-        options.AddPolicy("AllowFrontend",
-            p => p
-                .WithOrigins("http://localhost:5173", "https://internhubfrontend-yvjd.onrender.com/", frontendUrl)
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials()
-        );
-    }
-    else
-    {
-        // Production: Only allow specific frontend URL
-        options.AddPolicy("AllowFrontend",
-            p => p
-                .WithOrigins(frontendUrl)
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials()
-        );
-    }
+        policy.WithOrigins(
+            "https://internhubfrontend-yvjd.onrender.com"
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
+    });
 });
 
 
