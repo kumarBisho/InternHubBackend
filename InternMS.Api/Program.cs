@@ -118,12 +118,15 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 //     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 // );
 
-var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+var connectionString =
+    Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
 
-Console.WriteLine("====================================");
-Console.WriteLine($"Connection String: [{connectionString}]");
-Console.WriteLine($"Length: {connectionString?.Length}");
-Console.WriteLine("====================================");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new Exception("ConnectionStrings__DefaultConnection is missing.");
+}
+
+Console.WriteLine($"Connection string begins with: {connectionString[..20]}");
 
 builder.Services.AddDbContextPool<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
