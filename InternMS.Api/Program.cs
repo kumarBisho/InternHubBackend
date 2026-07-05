@@ -28,6 +28,9 @@ using Serilog;
 using Serilog.AspNetCore;
 using Serilog.Core;
 using Serilog.Events;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -237,44 +240,27 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var MigrationLogger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-    try
+    MigrationLogger.LogWarning("DbContext Assembly: {assembly}",
+        typeof(AppDbContext).Assembly.FullName);
+
+    var migrationsAssembly = db.GetService<IMigrationsAssembly>();
+
+    MigrationLogger.LogWarning("Migration Assembly Type: {type}",
+        migrationsAssembly.GetType().FullName);
+
+    MigrationLogger.LogWarning("Migration Count: {count}",
+        migrationsAssembly.Migrations.Count);
+
+    foreach (var migration in migrationsAssembly.Migrations)
     {
-        MigrationLogger.LogWarning("===== MIGRATION START =====");
-
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        MigrationLogger.LogWarning("===== ALL MIGRATIONS =====");
-
-        foreach (var migration in db.Database.GetMigrations())
-        {
-            MigrationLogger.LogWarning("Migration: {Migration}", migration);
-        }
-
-        MigrationLogger.LogWarning("===== APPLIED MIGRATIONS =====");
-
-        foreach (var migration in db.Database.GetAppliedMigrations())
-        {
-            MigrationLogger.LogWarning("Applied: {Migration}", migration);
-        }
-
-        MigrationLogger.LogWarning("===== PENDING MIGRATIONS =====");
-
-        foreach (var migration in db.Database.GetPendingMigrations())
-        {
-            MigrationLogger.LogWarning("Pending: {Migration}", migration);
-        }
-
-        db.Database.Migrate();
-
-        MigrationLogger.LogWarning("===== MIGRATION SUCCESS =====");
+        MigrationLogger.LogWarning("Migration: {migration}", migration.Key);
     }
-    catch (Exception ex)
-    {
-        MigrationLogger.LogError(ex, "Migration failed");
-        throw;
-    }
+
+    db.Database.Migrate();
 }
+
 
 // ============================================================================
 // Middleware Pipeline - OPTIMAL ORDER FOR SECURITY AND PERFORMANCE
