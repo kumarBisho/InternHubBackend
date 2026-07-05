@@ -129,7 +129,10 @@ if (string.IsNullOrWhiteSpace(connectionString))
 Console.WriteLine($"Connection string begins with: {connectionString[..20]}");
 
 builder.Services.AddDbContextPool<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(
+        connectionString,
+        b => b.MigrationsAssembly("InternMS.Infrastructure")
+    ));
 
 // JWT Settings
 var jwtKey = builder.Configuration["Jwt:Key"];
@@ -233,10 +236,23 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-    var db = services.GetRequiredService<AppDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-    db.Database.Migrate();
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        logger.LogInformation("Applying EF migrations...");
+
+        db.Database.Migrate();
+
+        logger.LogInformation("EF migrations completed successfully.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "EF migration failed.");
+        throw;
+    }
 }
 
 // ============================================================================
