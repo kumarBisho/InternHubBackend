@@ -244,10 +244,26 @@ using (var scope = app.Services.CreateScope())
 
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        using var conn = db.Database.GetDbConnection();
+        MigrationLogger.LogWarning("===== ALL MIGRATIONS =====");
 
-        MigrationLogger.LogWarning("Database = {db}", conn.Database);
-        MigrationLogger.LogWarning("DataSource = {ds}", conn.DataSource);
+        foreach (var migration in db.Database.GetMigrations())
+        {
+            MigrationLogger.LogWarning("Migration: {Migration}", migration);
+        }
+
+        MigrationLogger.LogWarning("===== APPLIED MIGRATIONS =====");
+
+        foreach (var migration in db.Database.GetAppliedMigrations())
+        {
+            MigrationLogger.LogWarning("Applied: {Migration}", migration);
+        }
+
+        MigrationLogger.LogWarning("===== PENDING MIGRATIONS =====");
+
+        foreach (var migration in db.Database.GetPendingMigrations())
+        {
+            MigrationLogger.LogWarning("Pending: {Migration}", migration);
+        }
 
         db.Database.Migrate();
 
