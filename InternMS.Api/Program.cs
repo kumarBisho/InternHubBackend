@@ -244,6 +244,11 @@ using (var scope = app.Services.CreateScope())
 
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
+        using var conn = db.Database.GetDbConnection();
+
+        MigrationLogger.LogWarning("Database = {db}", conn.Database);
+        MigrationLogger.LogWarning("DataSource = {ds}", conn.DataSource);
+
         db.Database.Migrate();
 
         MigrationLogger.LogWarning("===== MIGRATION SUCCESS =====");
