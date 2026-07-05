@@ -236,24 +236,23 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var migrationLogger = scope.ServiceProvider
-        .GetRequiredService<ILogger<Program>>();
+    var migrationLogger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-    try
+    migrationLogger.LogWarning("===== MIGRATION START =====");
+
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    migrationLogger.LogWarning("Pending migrations: {Count}",
+        db.Database.GetPendingMigrations().Count());
+
+    foreach (var migration in db.Database.GetPendingMigrations())
     {
-        migrationLogger.LogInformation("Starting database migration...");
-
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        db.Database.Migrate();
-
-        migrationLogger.LogInformation("Database migration completed.");
+        migrationLogger.LogWarning("Pending: {Migration}", migration);
     }
-    catch (Exception ex)
-    {
-        migrationLogger.LogError(ex, "Database migration failed.");
-        throw;
-    }
+
+    db.Database.Migrate();
+
+    migrationLogger.LogWarning("===== MIGRATION END =====");
 }
 
 // ============================================================================
