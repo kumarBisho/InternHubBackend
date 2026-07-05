@@ -231,6 +231,14 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var db = services.GetRequiredService<AppDbContext>();
+
+    db.Database.Migrate();
+}
+
 // ============================================================================
 // Middleware Pipeline - OPTIMAL ORDER FOR SECURITY AND PERFORMANCE
 // ============================================================================
