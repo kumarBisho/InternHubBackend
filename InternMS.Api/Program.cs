@@ -236,21 +236,22 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    var migrationLogger = scope.ServiceProvider
+        .GetRequiredService<ILogger<Program>>();
 
     try
     {
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        migrationLogger.LogInformation("Starting database migration...");
 
-        logger.LogInformation("Applying EF migrations...");
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         db.Database.Migrate();
 
-        logger.LogInformation("EF migrations completed successfully.");
+        migrationLogger.LogInformation("Database migration completed.");
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "EF migration failed.");
+        migrationLogger.LogError(ex, "Database migration failed.");
         throw;
     }
 }
