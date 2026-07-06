@@ -46,6 +46,7 @@ appsettings.Production.json
 
 ## Auto-generated files
 *.designer.cs
+!InternMS.Infrastructure/Migrations/*.Designer.cs
 *.generated.cs
 TestResults/
 *.coverage
