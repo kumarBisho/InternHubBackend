@@ -19,13 +19,15 @@ namespace InternMS.Api.Services.Auth
         private readonly AppDbContext _db;
         private readonly IEmailService _emailService;
         private readonly ITokenService _tokenService;
+        private readonly IConfiguration _configuration;
         private readonly ILogger<AuthService>? _logger;
 
-        public AuthService(AppDbContext db, IEmailService emailService, ITokenService tokenService, ILogger<AuthService>? logger = null)
+        public AuthService(AppDbContext db, IEmailService emailService, ITokenService tokenService, IConfiguration configuration, ILogger<AuthService>? logger = null)
         {
             _db = db;
             _emailService = emailService;
             _tokenService = tokenService;
+            _configuration = configuration;
             _logger = logger;
         }
 
@@ -114,8 +116,17 @@ namespace InternMS.Api.Services.Auth
 
             await _db.SaveChangesAsync();
 
-            var confirmLink = $"http://localhost:5248/api/auth/confirm-email?token={token}";
-            var verifyUserLink = $"http://localhost:5248/api/auth/approve-user?userId={user.Id}";
+            var backendBaseUrl = _configuration["Backend:BaseUrl"]
+                ?? Environment.GetEnvironmentVariable("BACKEND_BASE_URL")
+                ?? "http://localhost:5248";
+            backendBaseUrl = backendBaseUrl.TrimEnd('/');
+
+            var adminEmail = _configuration["Admin:Email"]
+                ?? Environment.GetEnvironmentVariable("ADMIN_EMAIL")
+                ?? "2021uec1535@mnit.ac.in";
+
+            var confirmLink = $"{backendBaseUrl}/api/auth/confirm-email?token={token}";
+            var verifyUserLink = $"{backendBaseUrl}/api/auth/approve-user?userId={user.Id}";
             
             await _emailService.SendEmailAsync(
                 email,
@@ -124,7 +135,7 @@ namespace InternMS.Api.Services.Auth
             );
 
             await _emailService.SendEmailAsync(
-                "2021uec1535@mnit.ac.in",
+                adminEmail,
                 "New User Registration",
                 $"A new user has registered with the email: {email}. Please review and approve the account by clicking <a href='{verifyUserLink}'>here</a>."
             );

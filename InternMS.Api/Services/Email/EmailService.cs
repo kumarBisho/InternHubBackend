@@ -32,6 +32,11 @@ namespace InternMS.Api.Services.Email
                 // If SMTP is not configured, log the email instead (development mode)
                 if (string.IsNullOrEmpty(smtpHost) || string.IsNullOrEmpty(smtpUser) || string.IsNullOrEmpty(smtpPass))
                 {
+                    if (!_env.IsDevelopment())
+                    {
+                        throw new InvalidOperationException("SMTP is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASS in the hosting environment.");
+                    }
+
                     _logger.LogWarning("[EMAIL] SMTP not configured. Running in development mode.");
                     _logger.LogInformation($"[EMAIL_DEV_MODE] To: {toEmail}");
                     _logger.LogInformation($"[EMAIL_DEV_MODE] Subject: {subject}");
