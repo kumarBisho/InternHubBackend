@@ -118,7 +118,7 @@ namespace InternMS.Api.Services.Auth
 
             var backendBaseUrl = _configuration["Backend:BaseUrl"]
                 ?? Environment.GetEnvironmentVariable("BACKEND_BASE_URL")
-                ?? "http://localhost:5248";
+                ?? "https://internhubbackend-h4qp.onrender.com";
             backendBaseUrl = backendBaseUrl.TrimEnd('/');
 
             var adminEmail = _configuration["Admin:Email"]
