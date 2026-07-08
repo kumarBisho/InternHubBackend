@@ -66,7 +66,21 @@ namespace InternMS.Api.Services.Email
                     };
                     mailMessage.To.Add(toEmail);
 
-                    await client.SendMailAsync(mailMessage);
+                    try
+                    {
+                        _logger.LogInformation("Before SendMailAsync");
+
+                        await client.SendMailAsync(mailMessage);
+
+                        _logger.LogInformation("Email sent successfully");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "SMTP failed");
+                        throw;
+                    }
+
+                    // await client.SendMailAsync(mailMessage);
                     _logger.LogInformation($"[EMAIL] Successfully sent email to: {toEmail}");
                 }
             }
